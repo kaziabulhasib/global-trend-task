@@ -47,8 +47,37 @@ const deleteTask = async (req, res) => {
   }
 };
 
+const updateTaskStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { completed } = req.body;
+
+    if (completed === undefined) {
+      return res.status(400).json({ message: "Completed status is required" });
+    }
+
+    const updatedTask = await taskModel.findByIdAndUpdate(
+      id,
+      { completed },
+      { new: true }
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.status(200).json({
+      message: "task updated successfully",
+      task: updatedTask,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   getTasks,
   createTask,
   deleteTask,
+  updateTaskStatus,
 };
